@@ -76,9 +76,11 @@ impl Component for Model {
     fn update(&mut self, msg: Self::Message) -> ShouldRender {
         match msg {
             Msg::Indexes => {
+                self.activeView = ActiveView::Indexes;
                 true
-            }
+            },
             Msg::Chunks => {
+                self.activeView = ActiveView::Chunks;
                 true
             }
         }
@@ -98,12 +100,15 @@ impl Renderable<Model> for Model {
                 <div class="container-fluid",>
                 <div class="row",>
             { self.view_side_bar() }
+
             // Main view with table
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main",>
                 <h1 class="page-header",>{"Dashboard"}</h1>
+
             {self.view_image_ribbon()}
-            <h2 class="sub-header",>{"Section title"}</h2>
+
             { self.view_table() }
+
             </div>
                 </div>
                 </div>
@@ -112,56 +117,77 @@ impl Renderable<Model> for Model {
     }
 }
 
-// impl Renderable<Model> for ActiveView {
-//     fn view(&self) -> Html<Self> {
-//         match *self {
-//             ActiveView::Indexes => {
-//                 html! {
-//                     { self.view_table() }
-//                 }
-//             },
-//             ActiveView::Chunks => {
-//                 html! {
-                    
-//                 }
-//             }
-//         }
-//     }
-// }
-
 impl Model {
     fn view_table(&self) -> Html<Self> {
         html!{
             <>
+                { self.get_table_title() }
                 <div class="table-responsive",>
                 <table class="table table-striped",>
                 <thead>
             { self.view_table_header() }
             </thead>
                 <tbody>
-            {for self.indexesView.indexes.iter().map(|i| html! {
-                <tr>
-                    <td> { i.id } </td>
-                    <td> { i.name.to_owned() } </td>
-                    <td>{ i.path.to_owned() }</td>
-                    <td>{ i.creation_time.to_owned() }</td>
-                    <td>{ i.accessed_time.to_owned() }</td>
-                    <td>{ i.stats_confirmed_download_count }</td>
-                    <td>{ i.stats_anonymous_download_count }</td>
-                    <td><button onclick=|_| Msg::Indexes,>{ "IndexesView" }</button></td>
-                    </tr>
-            })}
+            { self.get_table_view() }
                 </tbody>
                 </table>
                 </div>
                 </>
         }
     }
+
+    fn get_table_view(&self) -> Html<Self> {
+        match self.activeView {
+            ActiveView::Indexes => {
+                html! {
+                    <>
+                    {for self.indexesView.indexes.iter().map(|i| html! {
+                        <tr>
+                            <td> { i.id } </td>
+                            <td> { i.name.to_owned() } </td>
+                            <td>{ i.path.to_owned() }</td>
+                            <td>{ i.creation_time.to_owned() }</td>
+                            <td>{ i.accessed_time.to_owned() }</td>
+                            <td>{ i.stats_confirmed_download_count }</td>
+                            <td>{ i.stats_anonymous_download_count }</td>
+                            <td><button onclick=|_| Msg::Chunks,>{ "ChunksView" }</button></td>
+                            </tr>
+                    })}
+                    </>
+                }
+            },
+            ActiveView::Chunks => {
+                html! {
+                    <>
+                        </>
+                }
+            }
+        }
+    }
+
+    fn get_table_title(&self) -> Html<Self> {
+        match self.activeView {
+            ActiveView::Indexes => {
+                html! {
+                    <>
+                        <h2 class="sub-header",>{"Indexes"}</h2>
+                    </>
+                }
+            },
+            ActiveView::Chunks => {
+                html! {
+                    <>
+                        <h2 class="sub-header",>{"Chunks"}</h2>
+                    </>
+                }
+            }
+        }
+    }
    fn view_table_header(&self) -> Html<Self> {
         html!{
             <>
                 <tr>
-                 <th>{"id"}</th>
+                <th>{"id"}</th>
                 <th>{"name"}</th>
                 <th>{"path"}</th>
                 <th>{"creation_time"}</th>
@@ -263,8 +289,8 @@ impl Model {
         html! {
             <>
                 <li class="active",> { self.view_side_bar_sub_sections_1_overview() } </li>
-                <li><a href="#",>{"Indexes"}</a></li>
-                <li><a href="#",>{"Chunks"}</a></li>
+                <li><a href="#", onclick=|_| Msg::Indexes,>{"Indexes"}</a></li>
+                <li><a href="#", onclick=|_| Msg::Chunks,>{"Chunks"}</a></li>
                 <li><a href="#",>{"Tags"}</a></li>
                 </>
         }
