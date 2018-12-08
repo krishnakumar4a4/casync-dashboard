@@ -5,11 +5,17 @@ extern crate serde;
 extern crate serde_json;
 #[macro_use]
 extern crate serde_derive;
+extern crate failure;
 
 use yew::prelude::*;
 mod db;
 mod ds;
+use failure::Error;
 use chrono::{DateTime, Utc};
+use yew::format::{Nothing, Json};
+use yew::services::fetch::{FetchService, Request, Response};
+use yew::services::ConsoleService;
+
 
 pub struct IndexesView {
     indexes: Vec<ds::IndexItem>
@@ -22,24 +28,33 @@ pub struct ChunksView {
 pub struct Model {
     indexesView: IndexesView,
     chunksView: ChunksView,
-    activeView: ActiveView
+    activeView: ActiveView,
+    link: ComponentLink<Model>,
+    fetchService: FetchService,
+    fetching: bool,
+    consoleService: ConsoleService
 }
 
 pub enum ActiveView {
     Indexes,
-    Chunks
+    Chunks,
+    Loading
 }
 
 pub enum Msg {
     Indexes,
-    Chunks
+    Chunks,
+    FetchedIndexes(Result<String, Error>),
+    FetchedChunks,
+//    FetchedChunks(Result<String, Error>),
+    FetchErr
 }
 
 impl Component for Model {
     type Message = Msg;
     type Properties = ();
 
-    fn create(_: Self::Properties, _: ComponentLink<Self>) -> Self {
+    fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
         let index1 = ds::IndexItem {
             id: 1,
             name: "test1".to_string(),
@@ -69,7 +84,11 @@ impl Component for Model {
         Model {
             indexesView: indexesView,
             chunksView: chunksView,
-            activeView: ActiveView::Indexes
+            activeView: ActiveView::Indexes,
+            fetchService: FetchService::new(),
+            fetching: false,
+            link,
+            consoleService: ConsoleService::new()
         }
     }
 
@@ -80,7 +99,26 @@ impl Component for Model {
                 true
             },
             Msg::Chunks => {
+                self.activeView = ActiveView::Loading;
+                self.fetching = true;
+                true
+            },
+            Msg::FetchedChunks => {
+                self.fetching = false;
                 self.activeView = ActiveView::Chunks;
+//                let chunks: Vec<ds::ChunkItem> = serde_json::from_str(&data.unwrap()).unwrap();
+                self.consoleService.log("Fetched chunks");
+                true
+            },
+            Msg::FetchedIndexes(data) => {
+                self.fetching = false;
+     //           println!("We got some data for indexes of len {}", Json(data).unwrap().len());
+                true
+            },
+            Msg::FetchErr => {
+                self.fetching = false;
+                println!("We got error while fetching data");
+                self.consoleService.debug("Got err while fetching");
                 true
             }
         }
@@ -161,6 +199,13 @@ impl Model {
                     <>
                         </>
                 }
+            },
+            ActiveView::Loading => {
+                html! {
+                    <>
+                        <tr> { "Loading .." } </tr>
+                        </>
+                }
             }
         }
     }
@@ -179,6 +224,13 @@ impl Model {
                     <>
                         <h2 class="sub-header",>{"Chunks"}</h2>
                     </>
+                }
+            },
+            ActiveView::Loading => {
+                html! {
+                    <>
+                        <h2 class="sub-header",>{"Loading"}</h2>
+                        </>
                 }
             }
         }

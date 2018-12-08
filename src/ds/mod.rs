@@ -4,7 +4,7 @@ use std::io::Read;
 use chrono::{DateTime, Utc};
 use db;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct TagItem {
     id: i32,
     name: String,
@@ -14,7 +14,7 @@ pub struct TagItem {
     accessed_time: String
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct ChunkItem {
     id: i32,
     index_id: i32,
@@ -28,7 +28,7 @@ pub struct ChunkItem {
     stats_download_count: i32
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct IndexItem {
     pub id: i32,
     pub name: String,
