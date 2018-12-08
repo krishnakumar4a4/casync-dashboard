@@ -13,7 +13,7 @@ mod ds;
 use failure::Error;
 use chrono::{DateTime, Utc};
 use yew::format::{Nothing, Json};
-use yew::services::fetch::{FetchService, Request, Response};
+use yew::services::fetch::{FetchService, Request, Response, FetchTask};
 use yew::services::ConsoleService;
 
 
@@ -32,7 +32,8 @@ pub struct Model {
     link: ComponentLink<Model>,
     fetchService: FetchService,
     fetching: bool,
-    consoleService: ConsoleService
+    consoleService: ConsoleService,
+    fetchTask: Option<FetchTask>
 }
 
 pub enum ActiveView {
@@ -45,7 +46,7 @@ pub enum Msg {
     Indexes,
     Chunks,
     FetchedIndexes(Result<String, Error>),
-    FetchedChunks,
+    FetchedChunks(Result<Vec<ds::ChunkItem>, Error>),
 //    FetchedChunks(Result<String, Error>),
     FetchErr
 }
@@ -88,7 +89,8 @@ impl Component for Model {
             fetchService: FetchService::new(),
             fetching: false,
             link,
-            consoleService: ConsoleService::new()
+            consoleService: ConsoleService::new(),
+            fetchTask: None
         }
     }
 
@@ -101,13 +103,27 @@ impl Component for Model {
             Msg::Chunks => {
                 self.activeView = ActiveView::Loading;
                 self.fetching = true;
+                let callback = self.link.send_back(move |response: Response<Json<Result<Vec<ds::ChunkItem>, Error>>>| {
+                    let (meta, Json(data)) = response.into_parts();
+                    println!("META: {:?}, {:?}", meta, data);
+                    if meta.status.is_success() {
+                        Msg::FetchedChunks(data)
+                    } else {
+                        Msg::FetchErr  // FIXME: Handle this error accordingly.
+                    }
+                });
+                let request = Request::get("http://localhost:8001/index/1/chunks").body(Nothing).unwrap();
+                let task = self.fetchService.fetch_binary(request, callback);
+                self.fetchTask = Some(task);
                 true
             },
-            Msg::FetchedChunks => {
+            Msg::FetchedChunks(data) => {
                 self.fetching = false;
                 self.activeView = ActiveView::Chunks;
-//                let chunks: Vec<ds::ChunkItem> = serde_json::from_str(&data.unwrap()).unwrap();
-                self.consoleService.log("Fetched chunks");
+                self.chunksView = ChunksView {
+                    chunks: data.unwrap()
+                };
+                //self.consoleService.log(&format!("Fetched chunks {}", data.unwrap().len()));
                 true
             },
             Msg::FetchedIndexes(data) => {
@@ -143,7 +159,7 @@ impl Renderable<Model> for Model {
             <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main",>
                 <h1 class="page-header",>{"Dashboard"}</h1>
 
-            {self.view_image_ribbon()}
+            //{self.view_image_ribbon()}
 
             { self.view_table() }
 
@@ -197,7 +213,18 @@ impl Model {
             ActiveView::Chunks => {
                 html! {
                     <>
-                        </>
+                    {for self.chunksView.chunks.iter().map(|i| html! {
+                        <tr>
+                            <td> { i.id } </td>
+                            <td> { i.name.to_owned() } </td>
+                            <td>{ i.size }</td>
+                            <td>{ i.creation_time.to_owned() }</td>
+                            <td>{ i.accessed_time.to_owned() }</td>
+                            <td>{ "Tags" }</td>
+                            <td>{ i.stats_download_count }</td>
+                            </tr>
+                    })}
+                    </>
                 }
             },
             ActiveView::Loading => {
@@ -235,19 +262,44 @@ impl Model {
             }
         }
     }
-   fn view_table_header(&self) -> Html<Self> {
-        html!{
-            <>
-                <tr>
-                <th>{"id"}</th>
-                <th>{"name"}</th>
-                <th>{"path"}</th>
-                <th>{"creation_time"}</th>
-                <th>{"accessed_time"}</th>
-                <th>{"# confirmed downloads"}</th>
-                <th>{"# anonymous downloads"}</th>
-                </tr>
-                </>
+    fn view_table_header(&self) -> Html<Self> {
+        match self.activeView {
+            ActiveView::Indexes => {
+                html!{
+                    <>
+                        <tr>
+                        <th>{"id"}</th>
+                        <th>{"name"}</th>
+                        <th>{"path"}</th>
+                        <th>{"creation_time"}</th>
+                        <th>{"accessed_time"}</th>
+                        <th>{"# confirmed downloads"}</th>
+                        <th>{"# anonymous downloads"}</th>
+                        </tr>
+                        </>
+                }
+            },
+            ActiveView::Chunks => {
+                html! {
+                    <>
+                        <tr>
+                        <th>{"id"}</th>
+                        <th>{"name"}</th>
+                        <th>{"size"}</th>
+                        <th>{"creation_time"}</th>
+                        <th>{"accessed_time"}</th>
+                        <th>{"tags"}</th>
+                        <th>{"# downloads"}</th>
+                        </tr>
+                    </>
+                }
+            },
+            ActiveView::Loading => {
+                html! {
+                    <>
+                    </>
+                }
+            }
         }
     }
     fn view_menu(&self) -> Html<Self> {
@@ -340,27 +392,10 @@ impl Model {
     fn view_side_bar_sub_sections_1(&self) -> Html<Self> {
         html! {
             <>
-                <li class="active",> { self.view_side_bar_sub_sections_1_overview() } </li>
+                <li class="active",><a href="#",>{"Overview"}</a></li>
                 <li><a href="#", onclick=|_| Msg::Indexes,>{"Indexes"}</a></li>
                 <li><a href="#", onclick=|_| Msg::Chunks,>{"Chunks"}</a></li>
                 <li><a href="#",>{"Tags"}</a></li>
-                </>
-        }
-    }
-
-    // Fix this
-    fn view_side_bar_sub_sections_1_overview(&self) -> Html<Self> {
-        html! {
-            <>
-                <a href="#",>{ self.view_side_bar_sub_sections_1_overview_span() }</a>
-                </>
-        }
-    }
-
-    fn view_side_bar_sub_sections_1_overview_span(&self) -> Html<Self> {
-        html! {
-            <>
-                <span class="sr-only",>{"Overview"}</span>
                 </>
         }
     }

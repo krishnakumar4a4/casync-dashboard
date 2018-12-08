@@ -6,26 +6,26 @@ use db;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct TagItem {
-    id: i32,
-    name: String,
+    pub id: i32,
+    pub name: String,
     //#[serde(with = "my_date_format")]
-    creation_time: String,
+    pub creation_time: String,
     //#[serde(with = "my_date_format")]
-    accessed_time: String
+    pub accessed_time: String
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ChunkItem {
-    id: i32,
-    index_id: i32,
-    name: String,
-    size: i32,
+    pub id: i32,
+    pub index_id: i32,
+    pub name: String,
+    pub size: i32,
     //#[serde(with = "my_date_format")]
-    creation_time: String,
+    pub creation_time: String,
     //#[serde(with = "my_date_format")]
-    accessed_time: String,
-    tags: Vec<TagItem>,
-    stats_download_count: i32
+    pub accessed_time: String,
+    pub tags: Vec<TagItem>,
+    pub stats_download_count: i32
 }
 
 #[derive(Serialize, Deserialize, Debug)]
