@@ -1,0 +1,8 @@
+[package]
+name = "dashboard"
+version = "0.1.0"
+authors = ["Krishna Kumar Thokala <krishna.thokala2010@gmail.com>"]
+
+[dependencies]
+# Needed the unreleased 0.5.0 version of yew, hence linking it releatively
+yew = {path = "../yew/"}
