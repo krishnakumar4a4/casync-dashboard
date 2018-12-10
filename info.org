@@ -1,0 +1,6 @@
+* Code patterns
+** Casync-dashboard-backend UI datastructures
+*** ChunkItemRow -> Doesn't contain nested structs, used for light weight fetch
+*** ChunkItem -> Does contain nested structs, detailed faetch
+** Dashboard UI datastructures
+*** DetailedChunks -> This will be mapped with ChunkItem struct of backend

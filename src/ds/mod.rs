@@ -29,12 +29,38 @@ pub struct ChunkItem {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct ChunkItemRow {
+    pub id: i32,
+    pub index_id: i32,
+    pub name: String,
+    pub size: i32,
+    //#[serde(with = "my_date_format")]
+    pub creation_time: String,
+    //#[serde(with = "my_date_format")]
+    pub accessed_time: String,
+    pub tags: Vec<i32>,
+    pub stats_download_count: i32
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct IndexItem {
     pub id: i32,
     pub name: String,
     pub path: String,
     // Chunks should be a lazy load
     pub chunks: Vec<ChunkItem>,
+    //#[serde(with = "my_date_format")]
+    pub creation_time: String,
+    //#[serde(with = "my_date_format")]
+    pub accessed_time: String,
+    pub stats_confirmed_download_count: i32,
+    pub stats_anonymous_download_count: i32
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct IndexItemRow {
+    pub id: i32,
+    pub name: String,
     //#[serde(with = "my_date_format")]
     pub creation_time: String,
     //#[serde(with = "my_date_format")]
