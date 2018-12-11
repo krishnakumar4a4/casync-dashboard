@@ -289,8 +289,7 @@ impl Renderable<Model> for Model {
 
             //{self.view_image_ribbon()}
 
-            { self.view_table() }
-
+            { self.main_view() }
             </div>
                 </div>
                 </div>
@@ -300,6 +299,78 @@ impl Renderable<Model> for Model {
 }
 
 impl Model {
+    fn main_view(&self) -> Html<Self> {
+        match self.activeView {
+            ActiveView::Upload => self.upload_view(),
+            _ => self.view_table()
+        }
+    }
+    fn upload_view(&self) -> Html<Self> {
+        html! {
+            <>
+                <div class="row placeholders",>
+                <table style="width:100%",>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>{self.upload_index_view()}</td>
+                    </tr>
+                    <tr>
+                        <td>{self.upload_blob_view()}</td>
+                        <td>{self.upload_separator()}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>{self.upload_chunks_view()}</td>
+                    </tr>
+                </table>
+                </div>
+            </>
+        }
+    }
+
+    fn upload_blob_view(&self) -> Html<Self> {
+        html!{
+            <>
+                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
+                    <input type="file",name="files[]",style="",/>
+                    <input type="submit",value="Upload blob File",name="submit",style="",/>
+                </form>
+            </>
+        }
+    }
+
+    fn upload_index_view(&self) -> Html<Self> {
+        html!{
+            <>
+                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
+                    <input type="file",name="files[]",style="",/>
+                    <input type="submit",value="Upload index File",name="submit",style="",/>
+                </form>
+            </>
+        }
+    }
+
+    fn upload_chunks_view(&self) -> Html<Self> {
+        html!{
+            <>
+                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
+                    <input type="file",name="files[]",style="",/>
+                    <input type="submit",value="Upload Chunks",name="submit",style="",/>
+                </form>
+            </>
+        }
+    }
+
+    fn upload_separator(&self) -> Html<Self> {
+        html! {
+            <>
+                <h1>{"|"}</h1>
+            </>
+        }
+    }
     fn view_table(&self) -> Html<Self> {
         html!{
             <>
@@ -320,6 +391,7 @@ impl Model {
 
     fn get_table_view(&self) -> Html<Self> {
         match self.activeView {
+            // This is not needed
             ActiveView::Upload => {
                 html! {
                     <>
@@ -662,6 +734,7 @@ impl Model {
     fn view_image_ribbon(&self) -> Html<Self> {
         html! {
             <div class="row placeholders",>
+            <div class="col-xs-6 col-sm-3 placeholder",>
             { self.view_image_ribbon_1() }
             </div>
                 <div class="col-xs-6 col-sm-3 placeholder",>
@@ -680,7 +753,6 @@ impl Model {
     fn view_image_ribbon_1(&self) -> Html<Self> {
         html! {
             <>
-                <div class="col-xs-6 col-sm-3 placeholder",>
                 <img src="data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==",width="200",height="200",class="img-responsive",alt="Generic placeholder thumbnail",/>
                 <h4>{"Label"}</h4>
                 <span class="text-muted",>{"Something else"}</span>
