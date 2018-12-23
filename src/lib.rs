@@ -334,10 +334,8 @@ impl Model {
     fn upload_blob_view(&self) -> Html<Self> {
         html!{
             <>
-                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
-                    <input type="file",name="files[]",style="",/>
-                    <input type="submit",value="Upload blob File",name="submit",style="",/>
-                </form>
+                    <input id="input-blob", type="file", name="blob", style="display:inline-block;",/>
+                    <button id="btn-blob", value="Upload",> { "Upload blob" } </button>
             </>
         }
     }
@@ -345,10 +343,8 @@ impl Model {
     fn upload_index_view(&self) -> Html<Self> {
         html!{
             <>
-                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
-                    <input type="file",name="files[]",style="",/>
-                    <input type="submit",value="Upload index File",name="submit",style="",/>
-                </form>
+                    <input id="input-index", type="file", name="index", style="display:inline-block;",/>
+                    <button id="btn-index", value="Upload",> { "Upload index" } </button>
             </>
         }
     }
@@ -356,10 +352,8 @@ impl Model {
     fn upload_chunks_view(&self) -> Html<Self> {
         html!{
             <>
-                <form method="post",enctype="multipart/form-data",style="display:inline-block;width:8%;",>
-                    <input type="file",name="files[]",style="",/>
-                    <input type="submit",value="Upload Chunks",name="submit",style="",/>
-                </form>
+                    <input id="input-chunks", type="file", name="chunks", style="display:inline-block;",/>
+                    <button id="btn-chunks", value="Upload",> { "Upload chunks" } </button>
             </>
         }
     }
