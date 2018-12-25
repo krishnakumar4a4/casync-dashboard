@@ -335,7 +335,8 @@ impl Model {
         html!{
             <>
                     <input id="input-blob", type="file", name="blob", style="display:inline-block;",/>
-                    <button id="btn-blob", value="Upload",> { "Upload blob" } </button>
+                    <button id="btn-blob", value="Upload",> { "Upload blob" } </button><br/>
+                    <progress id="progress-blob", style = "margin-left: -43%;margin-top: 3%; display:none",/>
             </>
         }
     }
@@ -344,7 +345,8 @@ impl Model {
         html!{
             <>
                     <input id="input-index", type="file", name="index", style="display:inline-block;",/>
-                    <button id="btn-index", value="Upload",> { "Upload index" } </button>
+                    <button id="btn-index", value="Upload",> { "Upload index" } </button><br/>
+                    <progress id="progress-index", style = "margin-left: -43%;margin-top: 3%; display:none",/>
             </>
         }
     }
@@ -352,8 +354,9 @@ impl Model {
     fn upload_chunks_view(&self) -> Html<Self> {
         html!{
             <>
-                    <input id="input-chunks", type="file", name="chunks", style="display:inline-block;",/>
-                    <button id="btn-chunks", value="Upload",> { "Upload chunks" } </button>
+                    <input id="input-chunks", type="file", name="chunks", style="display:inline-block;", multiple="multiple", disabled=true,/>
+                    <button id="btn-chunks", value="Upload", disabled=true,> { "Upload chunks" } </button><br/>
+                    <progress id="progress-chunks", style = "margin-left: -43%;margin-top: 3%; display:none",/>
             </>
         }
     }
