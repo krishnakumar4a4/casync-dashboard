@@ -310,9 +310,10 @@ impl Model {
             <>
                 <div class="row placeholders",>
                 <table style="width:100%",>
+                    { self.upload_view_header() }
                     <tr>
                         <td></td>
-                        <td></td>
+                        <td>{self.upload_separator()}</td>
                         <td>{self.upload_index_view()}</td>
                     </tr>
                     <tr>
@@ -322,11 +323,23 @@ impl Model {
                     </tr>
                     <tr>
                         <td></td>
-                        <td></td>
+                        <td>{self.upload_separator()}</td>
                         <td>{self.upload_chunks_view()}</td>
                     </tr>
                 </table>
                 </div>
+            </>
+        }
+    }
+
+    fn upload_view_header(&self) -> Html<Self> {
+        html! {
+            <>
+                <tr>
+                    <td><h3>{"Upload blob below"}</h3></td>
+                    <td><h3>{"(Or)"}</h3></td>
+                    <td><h3>{"Upload index and chunks below"}</h3></td>
+                </tr>
             </>
         }
     }
@@ -337,6 +350,10 @@ impl Model {
                     <input id="input-blob", type="file", name="blob", style="display:inline-block;",/>
                     <button id="btn-blob", value="Upload",> { "Upload blob" } </button><br/>
                     <progress id="progress-blob", style = "margin-left: -43%;margin-top: 3%; display:none",/>
+                    <p style = "margin-left: -43%;margin-top: 3%",>
+                        <input id="input-blob-index-name", type="text", style="margin-left: 7%;",/>
+                        <span style="font-size: larger;",>{ ".caibx" }</span>
+                    </p>
             </>
         }
     }
@@ -606,14 +623,6 @@ impl Model {
             }
         }
     }
-    // fn view_menu(&self) -> Html<Self> {
-    //     html! {
-    //         <>
-    //             <button onclick=|_| Msg::IndexesAll,>{ "IndexesView" }</button>
-    //             <button onclick=|_| Msg::ChunksAll,>{ "ChunksView" }</button>
-    //             </>
-    //     }
-    // }
 
     // Top navigation bar related views
     fn nav_sections(&self) -> Html<Self> {
