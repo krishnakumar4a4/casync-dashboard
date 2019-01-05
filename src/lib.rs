@@ -16,7 +16,6 @@ use yew::format::{Nothing, Json};
 use yew::services::fetch::{FetchService, Request, Response, FetchTask};
 use yew::services::ConsoleService;
 
-
 pub struct IndexesView {
     indexes: Vec<ds::IndexItemRow>
 }
@@ -275,25 +274,24 @@ impl Renderable<Model> for Model {
             <>
                 // Top Navigation bar
                 <nav class="navbar navbar-inverse navbar-fixed-top",>
-            {self.nav_sections()}
-            </nav>
+                    {self.nav_sections()}
+                </nav>
 
                 // Side nav bar
                 <div class="container-fluid",>
-                <div class="row",>
-            { self.view_side_bar() }
+                    <div class="row",>
+                    { self.view_side_bar() }
 
-            // Main view with table
-            <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main",>
-                <h1 class="page-header",>{"Dashboard"}</h1>
+                        // Main view with table
+                        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main",>
+                            <h1 class="page-header",>{"Dashboard"}</h1>
 
-            //{self.view_image_ribbon()}
-
-            { self.main_view() }
-            </div>
+                            //{self.view_image_ribbon()}
+                            { self.main_view() }
+                        </div>
+                    </div>
                 </div>
-                </div>
-                </>
+            </>
         }
     }
 }
@@ -389,17 +387,46 @@ impl Model {
         html!{
             <>
                 { self.get_table_title() }
+                { self.get_graph_view() }
                 <div class="table-responsive",>
-                <table class="table table-striped",>
-                <thead>
-            { self.view_table_header() }
-            </thead>
-                <tbody>
-            { self.get_table_view() }
-                </tbody>
-                </table>
+                    <table class="table table-striped",>
+                        <thead>
+                        { self.view_table_header() }
+                        </thead>
+                        <tbody>
+                        { self.get_table_view() }
+                        </tbody>
+                    </table>
                 </div>
-                </>
+            </>
+        }
+    }
+
+    fn get_graph_view(&self) -> Html<Self> {
+        match self.activeView {
+            ActiveView::Indexes => {
+                html! {
+                    <>
+                        <div id="graph-container",style="min-width: 310px; height: 400px; margin: 0 auto; display: None; width:100%",></div><br/>
+                        <button id="btn-view-indexes-graph",> {"View Graph"} </button>
+                        <button id="graph-container-close",> {"X"} </button>
+                    </>
+                }
+            },
+            ActiveView::Chunks => {
+                html! {
+                    <>
+                        <div id="graph-container",style="min-width: 310px; height: 400px; margin: 0 auto; display: None; width:100%",></div><br/>
+                        <button id="btn-view-chunks-graph",> {"View Graph"} </button>
+                        <button id="graph-container-close",> {"X"} </button>
+                    </>
+                }
+            },
+            _ => {
+                html! {
+                    <></>
+                }
+            }
         }
     }
 
@@ -690,15 +717,15 @@ impl Model {
         html! {
             <>
                 <ul class="nav nav-sidebar",>
-            { self.view_side_bar_sub_sections_1() }
-            </ul>
-                <ul class="nav nav-sidebar",>
-            { self.view_side_bar_sub_sections_2() }
-            </ul>
-                <ul class="nav nav-sidebar",>
-            {self.view_side_bar_sub_sections_3() }
-            </ul>
-                </>
+                    { self.view_side_bar_sub_sections_1() }
+                </ul>
+                // <ul class="nav nav-sidebar",>
+                //     { self.view_side_bar_sub_sections_2() }
+                // </ul>
+                // <ul class="nav nav-sidebar",>
+                //     {self.view_side_bar_sub_sections_3() }
+                // </ul>
+            </>
         }
     }
 

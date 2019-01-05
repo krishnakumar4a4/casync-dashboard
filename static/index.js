@@ -1,9 +1,179 @@
 var index_id;
 
+console.log("highcharts", Highcharts);
+
 $(document).ready(function() {
     console.log("on page load");
+    $("#graph-container").css("display","none");
 });
 
+$(document).on("click", "#graph-container-close", function() {
+    $("#graph-container").css("display","none");
+});
+
+// How to call javascript library from rust?
+$(document).on("click", "#btn-view-chunks-graph", function() {
+    $("#graph-container").css("display","inline-block");
+    $.ajax({
+        url: "http://localhost:8001/chunks",
+        crossDomain: true,
+        cache: false,
+        contentType: "text/plain",
+        processData: false,
+        type: 'get',
+        success: function(data) {
+            var chunk_ids = [];
+            var download_counts = [];
+            for(i=0; i<data.length;i++) {
+                chunk_ids = chunk_ids.concat(data[i].id);
+                download_counts = download_counts.concat(data[i].stats_download_count)
+            }
+            Highcharts.chart('graph-container', {
+                chart: {
+                    type: 'area',
+                    spacingBottom: 30
+                },
+                title: {
+                    text: 'Chunk download trends'
+                },
+                subtitle: {
+                    text: '* Lists all the available chunks',
+                    floating: true,
+                    align: 'right',
+                    verticalAlign: 'bottom',
+                    y: 15
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    verticalAlign: 'top',
+                    x: 100,
+                    y: 70,
+                    floating: true,
+                    borderWidth: 1,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                },
+                xAxis: {
+                    categories: chunk_ids
+                },
+                yAxis: {
+                    title: {
+                        text: 'Y-Axis'
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value;
+                        }
+                    }
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            this.x + ': ' + this.y;
+                    }
+                },
+                plotOptions: {
+                    area: {
+                        fillOpacity: 0.5
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Chunks All',
+                    data: download_counts
+                }]
+            });
+        },
+        fail: function() {
+            $("#graph-container").css("display","none");
+        }
+    });
+});
+
+$(document).on("click", "#btn-view-indexes-graph", function() {
+    $("#graph-container").css("display","inline-block");
+    $.ajax({
+        url: "http://localhost:8001/indexes",
+        crossDomain: true,
+        cache: false,
+        contentType: "text/plain",
+        processData: false,
+        type: 'get',
+        success: function(data) {
+            var index_ids = [];
+            var download_counts = [];
+            for(i=0; i<data.length;i++) {
+                index_ids = index_ids.concat(data[i].id);
+                download_counts = download_counts.concat(data[i].stats_confirmed_download_count)
+            }
+            Highcharts.chart('graph-container', {
+                chart: {
+                    type: 'area',
+                    spacingBottom: 30
+                },
+                title: {
+                    text: 'Index download trends'
+                },
+                subtitle: {
+                    text: '* Lists all the available indexes',
+                    floating: true,
+                    align: 'right',
+                    verticalAlign: 'bottom',
+                    y: 15
+                },
+                legend: {
+                    layout: 'vertical',
+                    align: 'left',
+                    verticalAlign: 'top',
+                    x: 100,
+                    y: 70,
+                    floating: true,
+                    borderWidth: 1,
+                    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+                },
+                xAxis: {
+                    categories: index_ids
+                },
+                yAxis: {
+                    title: {
+                        text: 'Y-Axis'
+                    },
+                    labels: {
+                        formatter: function () {
+                            return this.value;
+                        }
+                    }
+                },
+                tooltip: {
+                    formatter: function () {
+                        return '<b>' + this.series.name + '</b><br/>' +
+                            this.x + ': ' + this.y;
+                    }
+                },
+                plotOptions: {
+                    area: {
+                        fillOpacity: 0.5
+                    }
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Indexes All',
+                    data: download_counts
+                }]
+            });
+        },
+        fail: function() {
+            $("#graph-container").css("display","none");
+        }
+    });
+});
+
+
+// Could not find alternative to getElementById in rust to read the file upload content from an element 
 $(document).on("click", "#btn-blob", function() {
     var index_file_name = $("#input-blob-index-name").val();
     if(index_file_name.length > 0) {
@@ -46,6 +216,7 @@ $(document).on("click", "#btn-blob", function() {
         alert("Index file name cannot be empty");
     }
 })
+
 $(document).on("click", "#btn-index", function() {
     var file = $("#input-index").prop("files")[0];   // Getting the properties of file from file field
     if(file) {
